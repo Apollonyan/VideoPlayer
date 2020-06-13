@@ -32,6 +32,7 @@ public struct VideoPlayer {
     
     @Binding private var play: Bool
     @Binding private var time: CMTime
+    @Binding private var rate: Float
     
     private var config = Config()
     
@@ -40,10 +41,17 @@ public struct VideoPlayer {
     ///   - url: http/https URL
     ///   - play: play/pause
     ///   - time: current time
-    public init(url: URL, play: Binding<Bool>, time: Binding<CMTime> = .constant(.zero)) {
+    ///   - rate: playback rate
+    public init(
+        url: URL,
+        play: Binding<Bool>,
+        time: Binding<CMTime> = .constant(.zero),
+        rate: Binding<Float> = .constant(1)
+    ) {
         self.url = url
         _play = play
         _time = time
+        _rate = rate
     }
 }
 
@@ -177,6 +185,7 @@ extension VideoPlayer: UIViewRepresentable {
         play ? uiView.play(for: url) : uiView.pause(reason: .userInteraction)
         uiView.isMuted = config.mute
         uiView.isAutoReplay = config.autoReplay
+        uiView.playerLayer.player?.rate = rate
         
         if let observerTime = context.coordinator.observerTime, time != observerTime {
             uiView.seek(to: time, toleranceBefore: time, toleranceAfter: time, completion: { _ in })
