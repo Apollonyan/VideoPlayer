@@ -183,9 +183,15 @@ extension VideoPlayer: UIViewRepresentable {
     
     public func updateUIView(_ uiView: VideoPlayerView, context: Context) {
         if play {
-            uiView.play(for: url)
-            if rate != uiView.playerLayer.player?.rate {
-                uiView.playerLayer.player?.rate = rate
+            if let player = uiView.playerLayer.player,
+                let item = player.currentItem,
+                1 < rate && item.canPlayFastForward
+                    || 0 < rate && rate < 1 && item.canPlaySlowForward
+                    || -1 < rate && rate < 0 && item.canPlaySlowReverse
+                    || rate < -1 && item.canPlayFastReverse {
+                player.rate = rate
+            } else {
+                uiView.play(for: url)
             }
         } else {
             uiView.pause(reason: .userInteraction)
