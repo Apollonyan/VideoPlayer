@@ -182,10 +182,16 @@ extension VideoPlayer: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: VideoPlayerView, context: Context) {
-        play ? uiView.play(for: url) : uiView.pause(reason: .userInteraction)
+        if play {
+            uiView.play(for: url)
+            if rate != uiView.playerLayer.player?.rate {
+                uiView.playerLayer.player?.rate = rate
+            }
+        } else {
+            uiView.pause(reason: .userInteraction)
+        }
         uiView.isMuted = config.mute
         uiView.isAutoReplay = config.autoReplay
-        uiView.playerLayer.player?.rate = rate
         
         if let observerTime = context.coordinator.observerTime, time != observerTime {
             uiView.seek(to: time, toleranceBefore: time, toleranceAfter: time, completion: { _ in })
