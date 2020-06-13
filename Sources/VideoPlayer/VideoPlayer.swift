@@ -28,7 +28,7 @@ public struct VideoPlayer {
         case error(NSError)
     }
     
-    private(set) var url: URL
+    let url: URL
     
     @Binding private var play: Bool
     @Binding private var time: CMTime
@@ -200,7 +200,7 @@ extension VideoPlayer: UIViewRepresentable {
         uiView.isAutoReplay = config.autoReplay
         
         if let observerTime = context.coordinator.observerTime, time != observerTime {
-            uiView.seek(to: time, toleranceBefore: time, toleranceAfter: time, completion: { _ in })
+            uiView.seek(to: time, toleranceBefore: time, toleranceAfter: time) { _ in }
         }
     }
     
